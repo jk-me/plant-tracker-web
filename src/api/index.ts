@@ -1,6 +1,35 @@
 import type { Plant, PlantFormData, Blooming, Photo, User } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+let csrfToken: string | null = null;
+
+async function fetchCsrfToken(): Promise<string | null> {
+  if (csrfToken) {
+    return csrfToken;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/csrf_token`, {
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: response.statusText }));
+    throw new Error(errorData.message ?? response.statusText);
+  }
+
+  const data = (await response.json()) as {
+    csrf_token?: string;
+    csrfToken?: string;
+    token?: string;
+  };
+
+  csrfToken = data.csrf_token ?? data.csrfToken ?? data.token ?? null;
+  return csrfToken;
+}
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -26,9 +55,12 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 }
 
 // Auth
-export function login(email_address: string, password: string): Promise<User> {
+export async function login(email_address: string, password: string): Promise<User> {
+  const token = await fetchCsrfToken();
   return request<User>('/login', {
     method: 'POST',
+    credentials: 'include',
+    headers: token ? { 'X-CSRF-Token': token } : undefined,
     body: JSON.stringify({ email_address, password }),
   });
 }
