@@ -4,6 +4,13 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 let csrfToken: string | null = null;
 
+function updateCsrfTokenFromResponse(response: Response): void {
+  const token = response.headers.get('X-CSRF-Token') ?? response.headers.get('x-csrf-token');
+  if (token) {
+    csrfToken = token;
+  }
+}
+
 async function fetchCsrfToken(): Promise<string | null> {
   if (csrfToken) {
     return csrfToken;
@@ -32,15 +39,21 @@ async function fetchCsrfToken(): Promise<string | null> {
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const method = (options.method ?? 'GET').toUpperCase();
+  const isMutating = !['GET', 'HEAD', 'OPTIONS'].includes(method);
+  const token = isMutating ? await fetchCsrfToken() : null;
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      ...(token ? { 'X-CSRF-Token': token } : {}),
       ...options.headers,
     },
   });
+
+  updateCsrfTokenFromResponse(response);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: response.statusText }));
@@ -56,11 +69,9 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 // Auth
 export async function login(email_address: string, password: string): Promise<User> {
-  const token = await fetchCsrfToken();
   return request<User>('/login', {
     method: 'POST',
     credentials: 'include',
-    headers: token ? { 'X-CSRF-Token': token } : undefined,
     body: JSON.stringify({ email_address, password }),
   });
 }
@@ -72,7 +83,9 @@ export function logout(): Promise<void> {
 export function signUp(email_address: string, password: string, password_confirmation: string): Promise<User> {
   return request<User>('/signup', {
     method: 'POST',
-    body: JSON.stringify({ user: { email_address, password, password_confirmation } }),
+    body: JSON.stringify({ user: { email_address, password, 
+    password_confirmation } }),
+
   });
 }
 
