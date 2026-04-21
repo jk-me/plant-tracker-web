@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LoginForm from './components/LoginForm';
 import PlantList from './components/PlantList';
 import type { User } from './types';
@@ -7,6 +7,29 @@ import './App.css';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [checkingSession, setCheckingSession] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    api.getCurrentUser()
+      .then((currentUser) => {
+        if (active) {
+          setUser(currentUser);
+        }
+      })
+      .catch(() => {
+        // Ignore unauthenticated responses.
+      })
+      .finally(() => {
+        if (active) {
+          setCheckingSession(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   async function handleLogout() {
     await api.logout();
@@ -25,7 +48,9 @@ function App() {
         )}
       </header>
       <main className="app-main">
-        {user ? (
+        {checkingSession ? (
+          <p>Checking session…</p>
+        ) : user ? (
           <PlantList />
         ) : (
           <LoginForm onSuccess={setUser} />

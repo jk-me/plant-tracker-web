@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type SubmitEvent } from 'react';
 import * as api from '../api';
 import type { User } from '../types';
 
@@ -12,15 +12,19 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setLoading(true);
     try {
       const user = await api.login(emailAddress, password);
       onSuccess(user);
+      setEmailAddress('');
+      setPassword('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
+      setEmailAddress('');
+      setPassword('');
     } finally {
       setLoading(false);
     }

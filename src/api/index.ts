@@ -80,6 +80,10 @@ export function logout(): Promise<void> {
   return request<void>('/session', { method: 'DELETE' });
 }
 
+export function getCurrentUser(): Promise<User> {
+  return request<User>('/session');
+}
+
 export function signUp(email_address: string, password: string, password_confirmation: string): Promise<User> {
   return request<User>('/signup', {
     method: 'POST',
