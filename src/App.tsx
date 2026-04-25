@@ -14,7 +14,7 @@ function App() {
     api.getCurrentUser()
       .then((currentUser) => {
         if (active) {
-          setUser(currentUser);
+          setUser(currentUser.user);
         }
       })
       .catch(() => {
@@ -35,7 +35,7 @@ function App() {
     await api.logout();
     setUser(null);
   }
-
+  console.log('Current user:', user);
   return (
     <div className="app">
       <header className="app-header">

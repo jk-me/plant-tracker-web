@@ -17,14 +17,13 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     setError(null);
     setLoading(true);
     try {
-      const user = await api.login(emailAddress, password);
-      onSuccess(user);
+      const data = await api.login(emailAddress, password);
+      onSuccess(data.user);
+      console.log('Logged in user:', data.user);
       setEmailAddress('');
       setPassword('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
-      setEmailAddress('');
-      setPassword('');
     } finally {
       setLoading(false);
     }
