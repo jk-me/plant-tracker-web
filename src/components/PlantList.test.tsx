@@ -3,39 +3,9 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import PlantList from './PlantList'
 import * as api from '../api'
-import type { Plant } from '../types'
+import { makePlant } from '../test/helper'
 
 vi.mock('../api')
-
-const makePlant = (id: number, name: string): Plant => ({
-  id,
-  name,
-  acquired_date: null,
-  blooming_size: false,
-  todo: null,
-  location: null,
-  last_update_date: null,
-  last_photo_date: null,
-  slow_release_date: null,
-  repotted_date: null,
-  orchid_family: null,
-  summer_in_out: null,
-  vendor: null,
-  cost: null,
-  shipping_cost: null,
-  total_cost: null,
-  mislabeled_original_tag: null,
-  light: null,
-  water: null,
-  temperature: null,
-  common_issues: null,
-  dormancy: null,
-  orchid_ancestry_link: null,
-  species_ancestry: null,
-  user_id: 1,
-  created_at: '2024-01-01',
-  updated_at: '2024-01-01',
-})
 
 describe('PlantList', () => {
   beforeEach(() => {

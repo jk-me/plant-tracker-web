@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginForm from './components/LoginForm'
 import PlantList from './components/PlantList'
 import type { User } from './types'
@@ -23,32 +24,41 @@ function App() {
 
     checkSession()
   }, [])
+
   async function handleLogout() {
     await api.logout()
     setUser(null)
   }
-  console.log('Current user:', user)
+
   return (
-    <div className="app">
-      <header className="app-header">
-        <h1>🌿 Plant Tracker</h1>
-        {user && (
-          <div className="header-actions">
-            <span>{user.email_address}</span>
-            <button onClick={handleLogout}>Sign Out</button>
-          </div>
-        )}
-      </header>
-      <main className="app-main">
-        {checkingSession ? (
-          <p>Checking session…</p>
-        ) : user ? (
-          <PlantList />
-        ) : (
-          <LoginForm onSuccess={setUser} />
-        )}
-      </main>
-    </div>
+    <BrowserRouter>
+      <div className="app">
+        <header className="app-header">
+          <h1>🌿 Plant Tracker</h1>
+          {user && (
+            <div className="header-actions">
+              <span>{user.email_address}</span>
+              <button onClick={handleLogout}>Sign Out</button>
+            </div>
+          )}
+        </header>
+        <main className="app-main">
+          {checkingSession ? (
+            <p>Checking session…</p>
+          ) : (
+            <Routes>
+              <Route path="/plants" element={user ? <PlantList /> : <Navigate to="/" replace />} />
+              <Route
+                path="/"
+                element={
+                  user ? <Navigate to="/plants" replace /> : <LoginForm onSuccess={setUser} />
+                }
+              />
+            </Routes>
+          )}
+        </main>
+      </div>
+    </BrowserRouter>
   )
 }
 
