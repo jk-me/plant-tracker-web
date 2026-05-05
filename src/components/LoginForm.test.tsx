@@ -17,7 +17,7 @@ describe('LoginForm', () => {
   it('calls api.login with entered credentials on submit', async () => {
     const user = userEvent.setup();
     const mockUser = { id: 1, email_address: 'a@b.com', created_at: '', updated_at: '' };
-    vi.mocked(api.login).mockResolvedValue(mockUser);
+    vi.mocked(api.login).mockResolvedValue({ user: mockUser });
 
     const onSuccess = vi.fn();
     render(<LoginForm onSuccess={onSuccess} />);
@@ -32,7 +32,7 @@ describe('LoginForm', () => {
 
   it('clears form fields after successful login', async () => {
     const user = userEvent.setup();
-    vi.mocked(api.login).mockResolvedValue({ id: 1, email_address: 'a@b.com', created_at: '', updated_at: '' });
+    vi.mocked(api.login).mockResolvedValue({ user: { id: 1, email_address: 'a@b.com', created_at: '', updated_at: '' } });
 
     render(<LoginForm onSuccess={vi.fn()} />);
     const emailInput = screen.getByLabelText(/email/i);

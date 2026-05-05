@@ -50,7 +50,9 @@ describe("api", () => {
       expect(loginCall[0]).toContain("/login");
       expect(loginCall[1].method).toBe("POST");
       const body = JSON.parse(loginCall[1].body as string);
-      expect(body).toEqual({ email_address: "a@b.com", password: "secret" });
+      expect(body).toEqual({
+        user: { email_address: "a@b.com", password: "secret" },
+      });
     });
 
     it("throws when the response is not ok", async () => {

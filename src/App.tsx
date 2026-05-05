@@ -10,27 +10,19 @@ function App() {
   const [checkingSession, setCheckingSession] = useState(true);
 
   useEffect(() => {
-    let active = true;
-    api.getCurrentUser()
-      .then((currentUser) => {
-        if (active) {
-          setUser(currentUser.user);
-        }
-      })
-      .catch(() => {
+    async function checkSession() {
+      try { 
+        const currentUser = await api.getCurrentUser();
+        setUser(currentUser.user);
+      } catch {
         // Ignore unauthenticated responses.
-      })
-      .finally(() => {
-        if (active) {
-          setCheckingSession(false);
-        }
-      });
+      } finally {
+        setCheckingSession(false);
+      }
+    }
 
-    return () => {
-      active = false;
-    };
+    checkSession();
   }, []);
-
   async function handleLogout() {
     await api.logout();
     setUser(null);
