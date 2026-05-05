@@ -1,10 +1,10 @@
-import { useState, type FormEvent } from 'react';
-import type { Plant, PlantFormData } from '../types';
+import { useState, type FormEvent } from 'react'
+import type { Plant, PlantFormData } from '../types'
 
 interface PlantFormProps {
-  initial?: Partial<Plant>;
-  onSubmit: (data: Partial<PlantFormData>) => Promise<void>;
-  onCancel: () => void;
+  initial?: Partial<Plant>
+  onSubmit: (data: Partial<PlantFormData>) => Promise<void>
+  onCancel: () => void
 }
 
 const dateFields: Array<{ key: keyof PlantFormData; label: string }> = [
@@ -13,7 +13,7 @@ const dateFields: Array<{ key: keyof PlantFormData; label: string }> = [
   { key: 'last_photo_date', label: 'Last Photo' },
   { key: 'slow_release_date', label: 'Slow Release' },
   { key: 'repotted_date', label: 'Re-Potted' },
-];
+]
 
 const textFields: Array<{ key: keyof PlantFormData; label: string }> = [
   { key: 'orchid_family', label: 'Orchid Family' },
@@ -25,40 +25,40 @@ const textFields: Array<{ key: keyof PlantFormData; label: string }> = [
   { key: 'summer_in_out', label: 'Summer In/Out' },
   { key: 'dormancy', label: 'Dormancy' },
   { key: 'mislabeled_original_tag', label: 'Mislabeled (Orig Tag)' },
-];
+]
 
 const costFields: Array<{ key: keyof PlantFormData; label: string }> = [
   { key: 'cost', label: 'Cost' },
   { key: 'shipping_cost', label: 'Shipping Cost' },
   { key: 'total_cost', label: 'Total Cost' },
-];
+]
 
 export default function PlantForm({ initial = {}, onSubmit, onCancel }: PlantFormProps) {
-  const [name, setName] = useState(initial.name ?? '');
-  const [bloomingSize, setBloomingSize] = useState(initial.blooming_size ?? false);
-  const [todo, setTodo] = useState(initial.todo ?? '');
-  const [commonIssues, setCommonIssues] = useState(initial.common_issues ?? '');
-  const [orchidAncestryLink, setOrchidAncestryLink] = useState(initial.orchid_ancestry_link ?? '');
-  const [speciesAncestry, setSpeciesAncestry] = useState(initial.species_ancestry ?? '');
+  const [name, setName] = useState(initial.name ?? '')
+  const [bloomingSize, setBloomingSize] = useState(initial.blooming_size ?? false)
+  const [todo, setTodo] = useState(initial.todo ?? '')
+  const [commonIssues, setCommonIssues] = useState(initial.common_issues ?? '')
+  const [orchidAncestryLink, setOrchidAncestryLink] = useState(initial.orchid_ancestry_link ?? '')
+  const [speciesAncestry, setSpeciesAncestry] = useState(initial.species_ancestry ?? '')
   const [fields, setFields] = useState<Record<string, string>>(() => {
-    const init: Record<string, string> = {};
+    const init: Record<string, string> = {}
     for (const { key } of [...dateFields, ...textFields, ...costFields]) {
-      const val = initial[key as keyof Plant];
-      init[key] = val != null ? String(val) : '';
+      const val = initial[key as keyof Plant]
+      init[key] = val != null ? String(val) : ''
     }
-    return init;
-  });
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+    return init
+  })
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
 
   function setField(key: string, value: string) {
-    setFields((prev) => ({ ...prev, [key]: value }));
+    setFields((prev) => ({ ...prev, [key]: value }))
   }
 
   async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
+    e.preventDefault()
+    setError(null)
+    setLoading(true)
     try {
       const data: Partial<PlantFormData> = {
         name,
@@ -67,15 +67,15 @@ export default function PlantForm({ initial = {}, onSubmit, onCancel }: PlantFor
         common_issues: commonIssues || null,
         orchid_ancestry_link: orchidAncestryLink || null,
         species_ancestry: speciesAncestry || null,
-      };
-      for (const [key, value] of Object.entries(fields)) {
-        (data as Record<string, unknown>)[key] = value || null;
       }
-      await onSubmit(data);
+      for (const [key, value] of Object.entries(fields)) {
+        ;(data as Record<string, unknown>)[key] = value || null
+      }
+      await onSubmit(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Save failed');
+      setError(err instanceof Error ? err.message : 'Save failed')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
@@ -86,12 +86,7 @@ export default function PlantForm({ initial = {}, onSubmit, onCancel }: PlantFor
 
       <label>
         Name *
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
       </label>
 
       <label className="checkbox-label">
@@ -140,20 +135,12 @@ export default function PlantForm({ initial = {}, onSubmit, onCancel }: PlantFor
 
       <label>
         To-Do
-        <textarea
-          value={todo}
-          onChange={(e) => setTodo(e.target.value)}
-          rows={3}
-        />
+        <textarea value={todo} onChange={(e) => setTodo(e.target.value)} rows={3} />
       </label>
 
       <label>
         Common Issues
-        <textarea
-          value={commonIssues}
-          onChange={(e) => setCommonIssues(e.target.value)}
-          rows={3}
-        />
+        <textarea value={commonIssues} onChange={(e) => setCommonIssues(e.target.value)} rows={3} />
       </label>
 
       <label>
@@ -183,5 +170,5 @@ export default function PlantForm({ initial = {}, onSubmit, onCancel }: PlantFor
         </button>
       </div>
     </form>
-  );
+  )
 }

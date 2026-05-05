@@ -1,20 +1,20 @@
-import { useState } from 'react';
-import type { Plant } from '../types';
+import { useState } from 'react'
+import type { Plant } from '../types'
 
 interface PlantCardProps {
-  plant: Plant;
-  onEdit: (plant: Plant) => void;
-  onDelete: (id: number) => void;
+  plant: Plant
+  onEdit: (plant: Plant) => void
+  onDelete: (id: number) => void
 }
 
 function daysSince(dateStr: string | null): string {
-  if (!dateStr) return '—';
-  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000);
-  return `${diff}d`;
+  if (!dateStr) return '—'
+  const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 86_400_000)
+  return `${diff}d`
 }
 
 export default function PlantCard({ plant, onEdit, onDelete }: PlantCardProps) {
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   return (
     <div className="plant-card">
@@ -71,5 +71,5 @@ export default function PlantCard({ plant, onEdit, onDelete }: PlantCardProps) {
         )}
       </div>
     </div>
-  );
+  )
 }

@@ -1,63 +1,56 @@
-import { useState, useEffect, useCallback } from 'react';
-import * as api from '../api';
-import type { Plant } from '../types';
-import PlantCard from './PlantCard';
-import PlantForm from './PlantForm';
+import { useState, useEffect, useCallback } from 'react'
+import * as api from '../api'
+import type { Plant } from '../types'
+import PlantCard from './PlantCard'
+import PlantForm from './PlantForm'
 
 export default function PlantList() {
-  const [plants, setPlants] = useState<Plant[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [editingPlant, setEditingPlant] = useState<Plant | null>(null);
-  const [showNewForm, setShowNewForm] = useState(false);
-  const [search, setSearch] = useState('');
+  const [plants, setPlants] = useState<Plant[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [editingPlant, setEditingPlant] = useState<Plant | null>(null)
+  const [showNewForm, setShowNewForm] = useState(false)
+  const [search, setSearch] = useState('')
 
   const loadPlants = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
     try {
-      const data = await api.getPlants();
-      setPlants(data);
+      const data = await api.getPlants()
+      setPlants(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load plants');
+      setError(err instanceof Error ? err.message : 'Failed to load plants')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
-    void loadPlants();
-  }, [loadPlants]);
+    void loadPlants()
+  }, [loadPlants])
 
   async function handleCreate(data: Parameters<typeof api.createPlant>[0]) {
-    const newPlant = await api.createPlant(data);
-    setPlants((prev) => [newPlant, ...prev]);
-    setShowNewForm(false);
+    const newPlant = await api.createPlant(data)
+    setPlants((prev) => [newPlant, ...prev])
+    setShowNewForm(false)
   }
 
   async function handleUpdate(data: Parameters<typeof api.updatePlant>[1]) {
-    if (!editingPlant) return;
-    const updated = await api.updatePlant(editingPlant.id, data);
-    setPlants((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-    setEditingPlant(null);
+    if (!editingPlant) return
+    const updated = await api.updatePlant(editingPlant.id, data)
+    setPlants((prev) => prev.map((p) => (p.id === updated.id ? updated : p)))
+    setEditingPlant(null)
   }
 
   async function handleDelete(id: number) {
-    await api.deletePlant(id);
-    setPlants((prev) => prev.filter((p) => p.id !== id));
+    await api.deletePlant(id)
+    setPlants((prev) => prev.filter((p) => p.id !== id))
   }
 
-  const filtered = plants.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const filtered = plants.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()))
 
   if (showNewForm) {
-    return (
-      <PlantForm
-        onSubmit={handleCreate}
-        onCancel={() => setShowNewForm(false)}
-      />
-    );
+    return <PlantForm onSubmit={handleCreate} onCancel={() => setShowNewForm(false)} />
   }
 
   if (editingPlant) {
@@ -67,7 +60,7 @@ export default function PlantList() {
         onSubmit={handleUpdate}
         onCancel={() => setEditingPlant(null)}
       />
-    );
+    )
   }
 
   return (
@@ -85,9 +78,7 @@ export default function PlantList() {
 
       {loading && <p>Loading…</p>}
       {error && <p className="error">{error}</p>}
-      {!loading && !error && filtered.length === 0 && (
-        <p>No plants found. Add your first plant!</p>
-      )}
+      {!loading && !error && filtered.length === 0 && <p>No plants found. Add your first plant!</p>}
 
       <div className="plant-grid">
         {filtered.map((plant) => (
@@ -100,5 +91,5 @@ export default function PlantList() {
         ))}
       </div>
     </div>
-  );
+  )
 }

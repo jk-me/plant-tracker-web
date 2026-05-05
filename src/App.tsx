@@ -1,33 +1,33 @@
-import { useEffect, useState } from 'react';
-import LoginForm from './components/LoginForm';
-import PlantList from './components/PlantList';
-import type { User } from './types';
-import * as api from './api';
-import './App.css';
+import { useEffect, useState } from 'react'
+import LoginForm from './components/LoginForm'
+import PlantList from './components/PlantList'
+import type { User } from './types'
+import * as api from './api'
+import './App.css'
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
-  const [checkingSession, setCheckingSession] = useState(true);
+  const [user, setUser] = useState<User | null>(null)
+  const [checkingSession, setCheckingSession] = useState(true)
 
   useEffect(() => {
     async function checkSession() {
-      try { 
-        const currentUser = await api.getCurrentUser();
-        setUser(currentUser.user);
+      try {
+        const currentUser = await api.getCurrentUser()
+        setUser(currentUser.user)
       } catch {
         // Ignore unauthenticated responses.
       } finally {
-        setCheckingSession(false);
+        setCheckingSession(false)
       }
     }
 
-    checkSession();
-  }, []);
+    checkSession()
+  }, [])
   async function handleLogout() {
-    await api.logout();
-    setUser(null);
+    await api.logout()
+    setUser(null)
   }
-  console.log('Current user:', user);
+  console.log('Current user:', user)
   return (
     <div className="app">
       <header className="app-header">
@@ -49,7 +49,7 @@ function App() {
         )}
       </main>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
