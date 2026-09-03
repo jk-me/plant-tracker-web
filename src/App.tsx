@@ -30,11 +30,20 @@ function App() {
     setUser(null)
   }
 
+  const goToDashboard = () => {
+    if (user) {
+      window.location.href = '/plants'
+    }
+  }
+
   return (
     <BrowserRouter>
       <div className="app">
         <header className="app-header">
-          <h1>🌿 Plant Tracker</h1>
+          <h1 onClick={goToDashboard}>
+            <img src="/icon.png" alt="Plant Tracker Icon" height="40" />
+            Plant Tracker
+          </h1>
           {user && (
             <div className="header-actions">
               <span>{user.email_address}</span>
