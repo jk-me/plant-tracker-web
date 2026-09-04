@@ -1,11 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import PlantList from './PlantList'
 import * as api from '../api'
 import { makePlant } from '../test/helper'
 
 vi.mock('../api')
+
+function renderPlantList() {
+  return render(
+    <MemoryRouter initialEntries={['/plants']}>
+      <Routes>
+        <Route path="/plants" element={<PlantList />} />
+        <Route path="/plants/new" element={<p>New Plant Page</p>} />
+        <Route path="/plants/:id/edit" element={<p>Edit Plant Page</p>} />
+      </Routes>
+    </MemoryRouter>
+  )
+}
 
 describe('PlantList', () => {
   beforeEach(() => {
@@ -17,25 +30,27 @@ describe('PlantList', () => {
 
   it('shows a loading state initially', () => {
     vi.mocked(api.getPlants).mockReturnValue(new Promise(() => {}))
-    render(<PlantList />)
+    renderPlantList()
     expect(screen.getByText(/loading/i)).toBeInTheDocument()
   })
 
-  it('renders plant cards after loading', async () => {
-    render(<PlantList />)
-    expect(await screen.findByText('Orchid Alpha')).toBeInTheDocument()
-    expect(screen.getByText('Orchid Beta')).toBeInTheDocument()
+  it('renders a table row per plant with editable cells', async () => {
+    renderPlantList()
+    expect(await screen.findByDisplayValue('Orchid Alpha')).toBeInTheDocument()
+    expect(screen.getByDisplayValue('Orchid Beta')).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: 'Family' })).toBeInTheDocument()
   })
 
   it('shows an error message when getPlants fails', async () => {
     vi.mocked(api.getPlants).mockRejectedValue(new Error('Network error'))
-    render(<PlantList />)
+    renderPlantList()
     expect(await screen.findByText(/network error/i)).toBeInTheDocument()
   })
 
   it('shows empty state message when no plants match search', async () => {
-    render(<PlantList />)
-    await screen.findByText('Orchid Alpha')
+    renderPlantList()
+    await screen.findByDisplayValue('Orchid Alpha')
 
     const user = userEvent.setup()
     await user.type(screen.getByPlaceholderText(/search plants/i), 'Zzz')
@@ -43,55 +58,63 @@ describe('PlantList', () => {
   })
 
   it('filters plants by search input', async () => {
-    render(<PlantList />)
-    await screen.findByText('Orchid Alpha')
+    renderPlantList()
+    await screen.findByDisplayValue('Orchid Alpha')
 
     const user = userEvent.setup()
     await user.type(screen.getByPlaceholderText(/search plants/i), 'Alpha')
 
-    expect(screen.getByText('Orchid Alpha')).toBeInTheDocument()
-    expect(screen.queryByText('Orchid Beta')).not.toBeInTheDocument()
+    expect(screen.getByDisplayValue('Orchid Alpha')).toBeInTheDocument()
+    expect(screen.queryByDisplayValue('Orchid Beta')).not.toBeInTheDocument()
   })
 
-  it('shows the new plant form when "+ New Plant" is clicked', async () => {
-    render(<PlantList />)
-    await screen.findByText('Orchid Alpha')
+  it('navigates to the new plant page when "+ New Plant" is clicked', async () => {
+    renderPlantList()
+    await screen.findByDisplayValue('Orchid Alpha')
 
     const user = userEvent.setup()
     await user.click(screen.getByRole('button', { name: /new plant/i }))
 
-    expect(screen.getByRole('heading', { name: /new plant/i })).toBeInTheDocument()
+    expect(await screen.findByText('New Plant Page')).toBeInTheDocument()
   })
 
-  it('adds a new plant and returns to the list', async () => {
-    const newPlant = makePlant(3, 'Orchid Gamma')
-    vi.mocked(api.createPlant).mockResolvedValue(newPlant)
-
-    render(<PlantList />)
-    await screen.findByText('Orchid Alpha')
+  it('navigates to the edit page when a row is clicked', async () => {
+    renderPlantList()
+    const nameInput = await screen.findByDisplayValue('Orchid Alpha')
 
     const user = userEvent.setup()
-    await user.click(screen.getByRole('button', { name: /new plant/i }))
-    await user.type(screen.getByLabelText(/name/i), 'Orchid Gamma')
-    await user.click(screen.getByRole('button', { name: /save/i }))
+    await user.click(nameInput.closest('tr')!)
 
-    expect(await screen.findByText('Orchid Gamma')).toBeInTheDocument()
+    expect(await screen.findByText('Edit Plant Page')).toBeInTheDocument()
   })
 
-  it('removes a plant after deletion is confirmed', async () => {
-    vi.mocked(api.deletePlant).mockResolvedValue(undefined)
-
-    render(<PlantList />)
-    await screen.findByText('Orchid Alpha')
+  it('saves an edited cell value', async () => {
+    vi.mocked(api.updatePlant).mockResolvedValue(makePlant(1, 'Orchid Alpha Updated'))
+    renderPlantList()
+    const nameInput = await screen.findByDisplayValue('Orchid Alpha')
 
     const user = userEvent.setup()
-    // There are two Delete buttons; click the first one
-    const deleteButtons = screen.getAllByRole('button', { name: /^delete$/i })
-    await user.click(deleteButtons[0])
-    await user.click(screen.getByRole('button', { name: /yes, delete/i }))
+    await user.clear(nameInput)
+    await user.type(nameInput, 'Orchid Alpha Updated')
+    await user.tab()
 
     await waitFor(() => {
-      expect(screen.queryByText('Orchid Alpha')).not.toBeInTheDocument()
+      expect(api.updatePlant).toHaveBeenCalledWith(1, { name: 'Orchid Alpha Updated' })
+    })
+  })
+
+  it('removes a plant after clicking delete', async () => {
+    vi.mocked(api.deletePlant).mockResolvedValue(undefined)
+
+    renderPlantList()
+    await screen.findByDisplayValue('Orchid Alpha')
+
+    const user = userEvent.setup()
+    const deleteButtons = screen.getAllByRole('button', { name: /^delete$/i })
+    await user.click(deleteButtons[0])
+
+    await waitFor(() => {
+      expect(screen.queryByDisplayValue('Orchid Alpha')).not.toBeInTheDocument()
     })
     expect(api.deletePlant).toHaveBeenCalledWith(1)
   })

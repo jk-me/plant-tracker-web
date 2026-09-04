@@ -61,74 +61,58 @@
   min-width: 200px;
 }
 
-.plant-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
-}
-
-/* Plant card */
-.plant-card {
+/* Plant table */
+.plant-table-wrapper {
+  overflow-x: auto;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+}
+
+.plant-table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.875rem;
   background: #fff;
 }
 
-.plant-card-header {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.plant-table th,
+.plant-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap;
+  text-align: left;
 }
 
-.plant-card-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  flex: 1;
-  color: #3c06c5;
-}
-
-.badge {
-  background-color: #2d6a4f;
-  color: #fff;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: bold;
-}
-
-.plant-details {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.25rem 0.75rem;
-  font-size: 0.875rem;
-  margin: 0;
-}
-
-.plant-details dt {
-  font-weight: 600;
+.plant-table th {
+  background: #f3f4f6;
   color: #6b7280;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
 }
 
-.plant-details dd {
-  margin: 0;
+.plant-table-row {
+  cursor: pointer;
+}
+
+.plant-table-row:hover {
+  background: #f9fafb;
+}
+
+.cell-input {
+  width: 100%;
+  min-width: 90px;
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 0.25rem;
+  font: inherit;
   color: teal;
 }
 
-.plant-card-actions {
-  display: flex;
-  gap: 0.5rem;
-  margin-top: auto;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.confirm-text {
-  font-size: 0.875rem;
-  color: #dc2626;
+.cell-input:hover,
+.cell-input:focus {
+  border-color: #d1d5db;
+  background: #fff;
 }
 
 /* Plant form */
