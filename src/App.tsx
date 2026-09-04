@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import LoginForm from './components/LoginForm'
 import PlantList from './components/PlantList'
+import PlantNewPage from './pages/PlantNewPage'
+import PlantEditPage from './pages/PlantEditPage'
 import type { User } from './types'
 import * as api from './api'
 import './App.css'
@@ -30,11 +32,20 @@ function App() {
     setUser(null)
   }
 
+  const goToDashboard = () => {
+    if (user) {
+      window.location.href = '/plants'
+    }
+  }
+
   return (
     <BrowserRouter>
       <div className="app">
         <header className="app-header">
-          <h1>🌿 Plant Tracker</h1>
+          <h1 onClick={goToDashboard}>
+            <img src="/icon.png" alt="Plant Tracker Icon" height="40" />
+            Plant Tracker
+          </h1>
           {user && (
             <div className="header-actions">
               <span>{user.email_address}</span>
@@ -48,6 +59,14 @@ function App() {
           ) : (
             <Routes>
               <Route path="/plants" element={user ? <PlantList /> : <Navigate to="/" replace />} />
+              <Route
+                path="/plants/new"
+                element={user ? <PlantNewPage /> : <Navigate to="/" replace />}
+              />
+              <Route
+                path="/plants/:id/edit"
+                element={user ? <PlantEditPage /> : <Navigate to="/" replace />}
+              />
               <Route
                 path="/"
                 element={

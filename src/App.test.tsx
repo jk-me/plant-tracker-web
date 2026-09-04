@@ -20,6 +20,6 @@ describe('App', () => {
     render(<App />)
     // After session check the user is redirected to /plants and the header shows the email
     expect(await screen.findByText(/a@b.com/i)).toBeInTheDocument()
-    expect(await screen.findByText('Schilleriana')).toBeInTheDocument()
+    expect(await screen.findByDisplayValue('Schilleriana')).toBeInTheDocument()
   })
 })
