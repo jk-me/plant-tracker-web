@@ -75,7 +75,6 @@
   background: #fff;
 }
 
-.plant-table th,
 .plant-table td {
   padding: 0.5rem 0.75rem;
   border-bottom: 1px solid #e5e7eb;
@@ -89,6 +88,22 @@
   font-weight: 600;
   position: sticky;
   top: 0;
+}
+
+.resizer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 6px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.resizer.isResizing {
+  background: #2d6a4f;
 }
 
 .plant-table-row {

@@ -20,7 +20,14 @@ export default function PlantEditPage() {
       setError(null)
       try {
         const data = await api.getPlant(Number(id))
-        if (!cancelled) setPlant(data)
+
+        if (!cancelled) {
+          if (!data) {
+            setError('Plant not found')
+          } else {
+            setPlant(data)
+          }
+        }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load plant')
       } finally {

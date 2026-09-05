@@ -4,7 +4,7 @@ import { useTable, createColumnHelper, flexRender } from '@tanstack/react-table'
 import * as api from '../api'
 import type { Plant, PlantFormData } from '../types'
 import EditableCell, { type FieldType } from './EditableCell'
-import { tableFeatureSet } from './tableFeatures'
+import { tableFeatureSet, defaultColumnSize } from './tableFeatures'
 
 const columnHelper = createColumnHelper<typeof tableFeatureSet, Plant>()
 
@@ -85,6 +85,7 @@ export default function PlantList() {
           header: label,
           cell: EditableCell,
           meta: { type },
+          ...defaultColumnSize(label),
         })
       ),
       columnHelper.display({
@@ -111,6 +112,8 @@ export default function PlantList() {
     features: tableFeatureSet,
     data: plants,
     columns,
+    columnResizeMode: 'onChange',
+    columnResizeDirection: 'ltr',
     state: { globalFilter: search },
     onGlobalFilterChange: setSearch,
     globalFilterFn: (row, _columnId, filterValue) =>
@@ -139,13 +142,21 @@ export default function PlantList() {
 
       {!loading && !error && table.getFilteredRowModel().rows.length > 0 && (
         <div className="plant-table-wrapper">
-          <table className="plant-table">
+          <table className="plant-table" style={{ width: table.getCenterTotalSize() }}>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <th key={header.id}>
                       {flexRender(header.column.columnDef.header, header.getContext())}
+                      <div
+                        onDoubleClick={() => header.column.resetSize()}
+                        onMouseDown={header.getResizeHandler()}
+                        onTouchStart={header.getResizeHandler()}
+                        className={`resizer ${
+                          table.options.columnResizeDirection
+                        } ${header.column.getIsResizing() ? 'isResizing' : ''}`}
+                      />
                     </th>
                   ))}
                 </tr>
@@ -159,7 +170,7 @@ export default function PlantList() {
                   onClick={() => navigate(`/plants/${row.original.id}/edit`)}
                 >
                   {row.getAllCells().map((cell) => (
-                    <td key={cell.id}>
+                    <td key={cell.id} style={{ width: cell.column.getSize() }}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
