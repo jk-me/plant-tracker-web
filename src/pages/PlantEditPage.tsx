@@ -47,9 +47,18 @@ export default function PlantEditPage() {
     navigate('/plants')
   }
 
+  const navigateToHistory = () => navigate(`/plants/${id}/history`)
+
   if (loading) return <p>Loading…</p>
   if (error) return <p className="error">{error}</p>
   if (!plant) return null
 
-  return <PlantForm initial={plant} onSubmit={handleUpdate} onCancel={() => navigate('/plants')} />
+  return (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <button onClick={navigateToHistory}>View History</button>
+      </div>
+      <PlantForm initial={plant} onSubmit={handleUpdate} onCancel={() => navigate('/plants')} />
+    </>
+  )
 }

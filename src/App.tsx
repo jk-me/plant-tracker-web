@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import PlantHistoryPage from './pages/PlantHistoryPage'
 import LoginForm from './components/LoginForm'
 import PlantList from './components/PlantList'
 import PlantNewPage from './pages/PlantNewPage'
@@ -66,6 +67,10 @@ function App() {
               <Route
                 path="/plants/:id/edit"
                 element={user ? <PlantEditPage /> : <Navigate to="/" replace />}
+              />
+              <Route
+                path="/plants/:id/history"
+                element={user ? <PlantHistoryPage /> : <Navigate to="/" replace />}
               />
               <Route
                 path="/"

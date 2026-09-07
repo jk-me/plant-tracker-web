@@ -105,6 +105,9 @@ export function getPlants(): Promise<Plant[]> {
 export function getPlant(id: number): Promise<Plant> {
   return request<Plant>(`/plants/${id}`)
 }
+export function getPlantHistory(plantId: number): Promise<any> {
+  return request<any>(`/plants/${plantId}/history`)
+}
 
 export function createPlant(plant: Partial<PlantFormData>): Promise<Plant> {
   return request<Plant>('/plants', {
